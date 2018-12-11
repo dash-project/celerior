@@ -5,22 +5,17 @@ void main()
 
 class SortFixture : public TestFixture
 {
+	std::map<std::string, std::vector<int>> _variables;
+
 public:
 	SortFixture()
 	{
 	}
 
 	//Map<Dimensions,Values>
-	std::map<std::string,std::vector<int>> getVariables()
+	std::map<std::string,std::vector<int>> variables() const
 	{
-		std::map<std::string, std::vector<int>> varMap;
-
-		std::vector<int> units;
-		units.push_back(1);
-		units.push_back(2);
-		units.push_back(4);
-		units.push_back(8);
-		varMap[std::string("units")] = units;
+		_variables["units"] = { 1,2,4,8 }
 
 		std::vector<int> size;
 		size.push_back(1024);
