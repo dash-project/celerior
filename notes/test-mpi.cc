@@ -7,9 +7,9 @@ class DashSortingFixture : public FixtureBase
 {
 	
 public:
-	void SetupFixture() {
+	void SetupFixture(){ 
 		set_units()
-			.range({ 1,2,4,8 });
+			.range({ 1,2,4,8 }); 
 		set_size()
 			.range(1024, 10240)
 			.step(times(2));

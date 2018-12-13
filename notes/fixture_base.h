@@ -1,3 +1,15 @@
+class times {
+public:
+	times(const Numeric mult) 
+	: _times(mult)
+	{}
+
+	Numeric mult() {
+		return _times;
+	}
+
+}
+
 
 template <class VarType>
 class FixtureVariable {
@@ -16,11 +28,20 @@ public:
 		_rangef = 1;
 		_first = from;
 		_last  = last;
+
 		if(_stepf == 1) {
 			VarType v = first;
 			while(v <= last){
 				_values.push_back(v);
-					v += _stepsize;
+				v += _stepsize;
+			}
+		}
+
+		if(steptf == 1) {
+			VarType v = first;
+			while(v <= last) {
+				_values.push_back(v);
+				v *= _times;
 			}
 		}
 		return *this;
@@ -31,6 +52,8 @@ public:
 	template <class Numeric>
 	self_t & step(Numeric step_size) {
 		_stepf = 1;
+		_stepsize = step_size;
+
 		if(_rangef == 1) {
 			VarType v = _first;
 			while(v <= _last) {
@@ -38,22 +61,32 @@ public:
 				v += step_size;
 			}
 		}
-		else {
-			_stepsize = step_size;
-		}
 		return *this;
 	}
 	
-	self_t & step(Times times) {
-		
+	self_t & step(times mult) {
+		steptf = 1;
+		_times = mult.mult;
+
+		if(_rangef == 1){
+			VarType v = _first;
+			while(v <= _last) {
+				_values.push_back(v);
+				v *= _times;
+			}
+		}
+		return *this;
+
 	}
 private:
+	int                  _steptf;
 	int                  _rangef;
 	int                  _stepf;
 	std::vector<VarType> _values;
 	VarType              _first;
 	VarType              _last;
-	Numeric              _stepsize
+	Numeric              _stepsize;
+	Numeric              _times;
 };
 
 class FixtureBase
