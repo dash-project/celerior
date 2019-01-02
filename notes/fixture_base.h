@@ -4,7 +4,7 @@ public:
 	: _times(mult)
 	{}
 
-	Numeric mult() {
+	Numeric mult() const {
 		return _times;
 	}
 
@@ -93,7 +93,7 @@ class FixtureBase
 {
 public:
 	// Map<Dimensions,Values>
-	std::map<std::string,std::vector<int>> variables() const
+	std::map<std::string,std::vector<FixtureVariable>> variables() const
 	{
 		return _variables;
 	}
@@ -112,5 +112,19 @@ public:
 		FixtureVariable _size = add_variable("size");
 		return _size;
 	}
+
+	void preSetup(const std::map<std::string,int>) {
+	}
+
+	void preIteration(const std::map<std::string,int>){
+	}
+
+	void postIteration(const std::map<std::string,int>){
+	}
+
+	void postSetup(const std::map<std::string,int>){
+	}
+
+
 };
 
