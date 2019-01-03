@@ -78,6 +78,14 @@ public:
 		return *this;
 
 	}
+
+	std::vector<VarType> values() const {
+		return _values;
+	}
+
+	std::string name() const {
+		return _name;
+	}
 private:
 	int                  _steptf;
 	int                  _rangef;
@@ -105,26 +113,95 @@ public:
 	
 	FixtureVariable & set_units() {
 		FixtureVariable _units = add_variable("units");
-		return _units;
+		return _variables["units"];
 	}
 
 	FixtureVariable & set_size() {
 		FixtureVariable _size = add_variable("size");
-		return _size;
+		return _variables["size"];
 	}
 
-	void preSetup(const std::map<std::string,int>) {
+	//Executed before everz sample
+	void preSample(const std::map<std::string,int>) {
 	}
 
+	//Executed before everz iteration
 	void preIteration(const std::map<std::string,int>){
 	}
 
+	//Executed after everz iteration
 	void postIteration(const std::map<std::string,int>){
 	}
 
-	void postSetup(const std::map<std::string,int>){
+	//Executed after everz sample
+	void postSample(const std::map<std::string,int>){
+	}
+
+	//Number of FixtureVariables
+	int numVar() {
+		_numVar = _variables.size();
+		return _numVar;
+	}
+
+	//Array with sizes of the vectors in the FixtureVariables
+	std::array<int> vecSizes() {
+		int vecSize;
+		int i = 0;
+		for(auto iter; iter = _variables.begin(); ++iter) {
+			vecSize = iter -> second.values().size();
+			_vecSizes[i] = vecSize;
+			i++;
+		}
+		return _vecSizes;
+	}
+
+	//Number of samples
+	int numSamples() {
+		samples = 1;
+		int size;
+		for(auto iter; iter = _variables.begin(); ++iter){
+			size = iter -> second.values().size();
+			samples *= size;
+		}
+
+		_samples = samples;
+		return samples;
+	}
+
+	//Map with values for a specific run of the benchmark
+	std::map<std::string,int> benchVariables(int count){
+		std::map<std::string,int> _benchVariables;
+		std::string name;
+		int value;
+		int now = 1;
+		int rest;
+		int position;
+		for(auto iter; iter = _variables.begin(); ++iter){
+			name = iter -> second.name();
+			if(now != _numVar){
+				rest = 1;
+				for(int i = now; i < _numVar; i++){
+					rest *= _vecSizes[i];
+				}
+				position = count/rest;
+				value = iter -> second.value()[position];
+			}
+			else{
+				position = count % _vecSizes[_numVar - 1];
+				value = iter -> second.value()[position];
+			}
+			_benchVariables[name] = value;
+
+		}
+
+		return _benchVariables;
 	}
 
 
+private:
+	std::map<std::string,std::vector<FixtureVariable>>    _variables;
+	int                                                   _numVar;
+	int                                                   _samples;
+	std::array<int,_numVar>                               _vecSizes;
 };
 
