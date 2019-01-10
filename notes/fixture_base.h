@@ -1,14 +1,23 @@
+#include <string>
+#include <iostream>
+#include <vector>
+#include <map>
+#include <iterator>
+
 class times {
 public:
-	times(const Numeric mult) 
+	times(const int mult) 
 	: _times(mult)
 	{}
 
-	Numeric mult() const {
+	int mult() const {
 		return _times;
 	}
 
-}
+private:
+	int         _times;
+
+};
 
 
 template <class VarType>
@@ -26,7 +35,7 @@ public:
 
 	self_t & range(VarType first, VarType last) {
 		_rangef = 1;
-		_first = from;
+		_first = first;
 		_last  = last;
 
 		if(_stepf == 1) {
@@ -37,7 +46,7 @@ public:
 			}
 		}
 
-		if(steptf == 1) {
+		if(_steptf == 1) {
 			VarType v = first;
 			while(v <= last) {
 				_values.push_back(v);
@@ -48,9 +57,7 @@ public:
 		
 	}
 
-	// TODO: also allow add_variable.step(2).range(10,20)
-	template <class Numeric>
-	self_t & step(Numeric step_size) {
+	self_t & step(VarType step_size) {
 		_stepf = 1;
 		_stepsize = step_size;
 
@@ -65,8 +72,8 @@ public:
 	}
 	
 	self_t & step(times mult) {
-		steptf = 1;
-		_times = mult.mult;
+		_steptf = 1;
+		_times = mult.mult();
 
 		if(_rangef == 1){
 			VarType v = _first;
@@ -86,86 +93,86 @@ public:
 	std::string name() const {
 		return _name;
 	}
+
 private:
+	std::string          _name;
 	int                  _steptf;
 	int                  _rangef;
 	int                  _stepf;
 	std::vector<VarType> _values;
 	VarType              _first;
 	VarType              _last;
-	Numeric              _stepsize;
-	Numeric              _times;
+	VarType              _stepsize;
+	int                  _times;
 };
-
+template<class VarType>
 class FixtureBase
 {
 public:
 	// Map<Dimensions,Values>
-	std::map<std::string,std::vector<FixtureVariable>> variables() const
+
+	std::map<std::string,FixtureVariable<VarType>> variables() const
 	{
 		return _variables;
 	}
 
-	FixtureVariable & add_variable(const std::string & var_name) {
-		_variables[var_name]        = FixtureVariable(var_name);
+	FixtureVariable<VarType> & add_variable(const std::string & var_name) {
+		_variables[var_name]        = FixtureVariable<VarType>(var_name);
 		return _variables[var_name];
 	}
-	
-	FixtureVariable & set_units() {
-		FixtureVariable _units = add_variable("units");
+	//
+	FixtureVariable<VarType> & set_units() {
+		FixtureVariable<VarType> _units = add_variable("units");
 		return _variables["units"];
 	}
 
-	FixtureVariable & set_size() {
-		FixtureVariable _size = add_variable("size");
+	FixtureVariable<VarType> & set_size() {
+		FixtureVariable<VarType> _size = add_variable("size");
 		return _variables["size"];
 	}
 
-	//Executed before everz sample
+	//Executed before every sample
 	void preSample(const std::map<std::string,int>) {
 	}
 
-	//Executed before everz iteration
+	//Executed before every iteration
 	void preIteration(const std::map<std::string,int>){
 	}
 
-	//Executed after everz iteration
+	//Executed after every iteration
 	void postIteration(const std::map<std::string,int>){
 	}
 
-	//Executed after everz sample
+	//Executed after every sample
 	void postSample(const std::map<std::string,int>){
 	}
 
 	//Number of FixtureVariables
-	int numVar() {
+	void numVar() {
 		_numVar = _variables.size();
-		return _numVar;
 	}
 
 	//Array with sizes of the vectors in the FixtureVariables
-	std::array<int> vecSizes() {
+	void vecSizes() {
 		int vecSize;
 		int i = 0;
-		for(auto iter; iter = _variables.begin(); ++iter) {
+		for(auto iter = _variables.begin(); iter != _variables.end(); ++iter) {
 			vecSize = iter -> second.values().size();
 			_vecSizes[i] = vecSize;
 			i++;
 		}
-		return _vecSizes;
 	}
 
 	//Number of samples
-	int numSamples() {
-		samples = 1;
+	void numSamples() {
+		int samples = 1;
 		int size;
-		for(auto iter; iter = _variables.begin(); ++iter){
+		for(auto iter = _variables.begin(); iter != _variables.end(); ++iter){
 			size = iter -> second.values().size();
 			samples *= size;
 		}
 
 		_samples = samples;
-		return samples;
 	}
 
 	//Map with values for a specific run of the benchmark
@@ -176,7 +183,7 @@ public:
 		int now = 1;
 		int rest;
 		int position;
-		for(auto iter; iter = _variables.begin(); ++iter){
+		for(auto iter = _variables.begin(); iter != _variables.end(); ++iter){
 			name = iter -> second.name();
 			if(now != _numVar){
 				rest = 1;
@@ -199,9 +206,9 @@ public:
 
 
 private:
-	std::map<std::string,std::vector<FixtureVariable>>    _variables;
+	std::map<std::string,FixtureVariable<VarType>>        _variables;
 	int                                                   _numVar;
 	int                                                   _samples;
-	std::array<int,_numVar>                               _vecSizes;
+	std::vector<int>                                      _vecSizes;
 };
 
