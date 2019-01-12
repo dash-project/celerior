@@ -4,24 +4,24 @@
 #include <map>
 #include <iterator>
 
+template <class VarType>
 class times {
 public:
-	times(const int mult) 
+	times(const VarType mult) 
 	: _times(mult)
 	{}
 
-	int mult() const {
+	VarType mult() const {
 		return _times;
 	}
 
 private:
-	int         _times;
+	VarType         _times;
 
 };
 
-
 template <class VarType>
-class FixtureVariable {
+class FixtureVariable{
 	typedef FixtureVariable<VarType> self_t;
 public:
 	FixtureVariable(const std::string & var_name)
@@ -71,7 +71,7 @@ public:
 		return *this;
 	}
 	
-	self_t & step(times mult) {
+	self_t & step(times<VarType> mult) {
 		_steptf = 1;
 		_times = mult.mult();
 
@@ -93,6 +93,10 @@ public:
 	std::string name() const {
 		return _name;
 	}
+	void temp(){
+		int cap = _values.capacity();
+		std::cout << "\n" << cap << "\n";
+	}
 
 private:
 	std::string          _name;
@@ -103,32 +107,37 @@ private:
 	VarType              _first;
 	VarType              _last;
 	VarType              _stepsize;
-	int                  _times;
+	VarType              _times;
 };
 template<class VarType>
 class FixtureBase
 {
 public:
-	// Map<Dimensions,Values>
 
-	std::map<std::string,FixtureVariable<VarType>> variables() const
+	// Map<Dimensions,Values>
+	std::vector<FixtureVariable<VarType>> variables() const
 	{
 		return _variables;
 	}
 
 	FixtureVariable<VarType> & add_variable(const std::string & var_name) {
-		_variables[var_name]        = FixtureVariable<VarType>(var_name);
-		return _variables[var_name];
+		FixtureVariable<VarType> _fix   = FixtureVariable<VarType>(var_name);
+		_variables.push_back(_fix);
+		return _variables.back();
 	}
-	//
+	
 	FixtureVariable<VarType> & set_units() {
-		FixtureVariable<VarType> _units = add_variable("units");
-		return _variables["units"];
+		add_variable("units");
+		return _variables.back();
 	}
 
 	FixtureVariable<VarType> & set_size() {
-		FixtureVariable<VarType> _size = add_variable("size");
-		return _variables["size"];
+		add_variable("size");
+		return _variables.back();
+	}
+
+	//Setup the FixtureVariables here
+	void setupFixture(){
 	}
 
 	//Executed before every sample
@@ -155,11 +164,9 @@ public:
 	//Array with sizes of the vectors in the FixtureVariables
 	void vecSizes() {
 		int vecSize;
-		int i = 0;
 		for(auto iter = _variables.begin(); iter != _variables.end(); ++iter) {
-			vecSize = iter -> second.values().size();
-			_vecSizes[i] = vecSize;
-			i++;
+			vecSize = iter -> values().size();
+			_vecSizes.push_back(vecSize);
 		}
 	}
 
@@ -168,14 +175,14 @@ public:
 		int samples = 1;
 		int size;
 		for(auto iter = _variables.begin(); iter != _variables.end(); ++iter){
-			size = iter -> second.values().size();
+			size = iter -> values().size();
 			samples *= size;
 		}
 
 		_samples = samples;
 	}
 
-	//Map with values for a specific run of the benchmark
+	//Map with values for a specific run(count) of the benchmark
 	std::map<std::string,int> benchVariables(int count){
 		std::map<std::string,int> _benchVariables;
 		std::string name;
@@ -184,18 +191,19 @@ public:
 		int rest;
 		int position;
 		for(auto iter = _variables.begin(); iter != _variables.end(); ++iter){
-			name = iter -> second.name();
+			name = iter -> name();
 			if(now != _numVar){
 				rest = 1;
 				for(int i = now; i < _numVar; i++){
 					rest *= _vecSizes[i];
 				}
-				position = count/rest;
-				value = iter -> second.value()[position];
+				position = (count/rest) % (_vecSizes[now-1]);
+				value = iter -> values()[position];
+				now++;
 			}
 			else{
 				position = count % _vecSizes[_numVar - 1];
-				value = iter -> second.value()[position];
+				value = iter -> values()[position];
 			}
 			_benchVariables[name] = value;
 
@@ -204,9 +212,21 @@ public:
 		return _benchVariables;
 	}
 
+	int get_numVar() const {
+		return _numVar;
+	}
+
+	int get_samples() const {
+		return _samples;
+	}
+
+	std::vector<int> get_vecSizes() const {
+		return _vecSizes;
+	}
+
 
 private:
-	std::map<std::string,FixtureVariable<VarType>>        _variables;
+	std::vector<FixtureVariable<VarType>>                 _variables;
 	int                                                   _numVar;
 	int                                                   _samples;
 	std::vector<int>                                      _vecSizes;
