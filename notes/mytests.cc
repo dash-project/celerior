@@ -41,21 +41,24 @@ void fixtureBaseTest(){
 	std::cout << "\n\n Testing class FixtureBase\n\n Adding FixtureVariables:\n";
 	FixtureBase<int> fb          = FixtureBase<int>();
 	FixtureVariable<int> units   = fb.add_variable("units").range(2,64).step(times<int>(2));
+	std::cout << "units:\n";
 	printVec(units.values());
 	FixtureVariable<int> size    = fb.set_size().step(1000).range(1000,10000);
+	std::cout << "size:\n";
 	printVec(size.values());
 	FixtureVariable<int> x   = fb.add_variable("x").range({1,2});
+	std::cout << "x:\n";
 	printVec(x.values());
 
 	fb.numVar();
 	int var = fb.get_numVar();
-	std::cout << "\n" << var << "\n";
+	std::cout << "\nNumber of vectors: " << var << "\n";
 	fb.numSamples();
 	int samples = fb.get_samples();
-	std::cout << "\n" << samples << "\n";
+	std::cout << "\nNumber of total samples:" << samples << "\n";
 	fb.vecSizes();
 	std::vector<int> Sizes = fb.get_vecSizes();
-	std::cout << "\n Sizes of variable vectors:";
+	std::cout << "\nSizes of variable vectors:";
 	for(auto iter = Sizes.begin(); iter != Sizes.end(); iter++){
 		std::cout << " " << *iter;
 	}
@@ -72,7 +75,7 @@ void fixtureBaseTest(){
 }
 int main(){
 	timesTest(5.0);
-	//fixtureVariableTest();
+	fixtureVariableTest();
 	fixtureBaseTest();
 	return 0;
 }
