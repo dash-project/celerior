@@ -7,7 +7,7 @@
 template <class VarType>
 class times {
 public:
-	times(const VarType mult) 
+	times(const VarType mult)
 	: _times(mult)
 	{}
 
@@ -54,7 +54,6 @@ public:
 			}
 		}
 		return *this;
-		
 	}
 
 	self_t & step(VarType step_size) {
@@ -70,7 +69,7 @@ public:
 		}
 		return *this;
 	}
-	
+
 	self_t & step(times<VarType> mult) {
 		_steptf = 1;
 		_times = mult.mult();
@@ -121,11 +120,11 @@ public:
 	}
 
 	FixtureVariable<VarType> & add_variable(const std::string & var_name) {
-		FixtureVariable<VarType> _fix   = FixtureVariable<VarType>(var_name);
+		FixtureVariable<VarType> _fix = FixtureVariable<VarType>(var_name);
 		_variables.push_back(_fix);
 		return _variables.back();
 	}
-	
+
 	FixtureVariable<VarType> & set_units() {
 		add_variable("units");
 		return _variables.back();
@@ -141,19 +140,19 @@ public:
 	}
 
 	//Executed before every sample
-	void preSample(const std::map<std::string,int>) {
+	void preSample(const std::map<std::string,int> & m) {
 	}
 
 	//Executed before every iteration
-	void preIteration(const std::map<std::string,int>){
+	void preIteration(const std::map<std::string,int> & m){
 	}
 
 	//Executed after every iteration
-	void postIteration(const std::map<std::string,int>){
+	void postIteration(const std::map<std::string,int> & m){
 	}
 
 	//Executed after every sample
-	void postSample(const std::map<std::string,int>){
+	void postSample(const std::map<std::string,int> & m){
 	}
 
 	//Number of FixtureVariables

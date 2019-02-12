@@ -1,6 +1,11 @@
 #include "gtest/gtest.h"
 #include "fixture_base.h"
 
+#include <iostream>
+#include <iomanip>
+#include <sstream>
+
+
 TEST(FixtureVariableInt,ListInit){
 	FixtureVariable<int> fv = FixtureVariable<int>("IntTest");
 	fv.range({1,2,4,8,16});
@@ -14,7 +19,7 @@ TEST(FixtureVariableInt,RangeStep){
 	fv2.range(2,16).step(2);
 	std::vector<int> testVec2 = {2,4,6,8,10,12,14,16};
 
-	EXPECT_EQ(testVec2,fv2.values());	
+	EXPECT_EQ(testVec2,fv2.values());
 }
 
 TEST(FixtureVariableInt,StepRange){
@@ -43,7 +48,24 @@ TEST(FixtureVariableDouble,StepTimesRange){
 
 }
 
+TEST(FixtureBase, Constructors) {
+
+    
+
+
+}
+
+
 int main (int argc, char* argv[]){
 	testing::InitGoogleTest(&argc, argv);
+
+  Result r;
+
+  //  http://www.cplusplus.com/reference/sstream/stringstream/
+  std::cout << "int value: "   << 123 << '\n'
+            << "float value: " << std::fixed << std::setprecision(4) << 1.23
+            << r
+            << std::endl;
+
 	return RUN_ALL_TESTS();
 }
