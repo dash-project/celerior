@@ -1,103 +1,112 @@
 #include "fixture_base.h"
+#include <sstream>
 
 class Results{
 public:
 	Results(std::vector<std::string> name ){
-		names = name;
+		_names = name;
 	}
 
 	void add_time(double time){
-		times.push_back(time);
+		_times.push_back(time);
 	}
 
 	std::vector<double> get_times() const{
-		return times;
+		return _times;
+	}
+	std::vector<std::string> names () const{
+		return _names;
 	}
 
-	void print_table(){
-
-		//Table header
-		std::string output = "";
-		for(int i = 0; i <= names.size(); i++){
-			for(int j = 0; j <= WIDTH; j++){
-				output+="-";
-			}
-		}
-		output += "\n";
-		for(int i = 0; i <= names.size(); i++){
-			if(i == names.size()){
-				std::string time = "time";
-				output += "|";
-				for(int j = 0; j < (WIDTH-time.size())/2; j++){
-					output += " ";
-				}
-				output += "time";
-				for(int j = 0; j < (WIDTH-time.size())/2; j++){
-					output += " ";
-				}
-			}
-			else{
-				output += "|";
-				for(int j = 0; j < (WIDTH-names[i].size())/2; j++){
-					output += " ";
-				}
-
-				output += names[i];
-				if(names[i].size() % 2 == 1){
-					for(int j = 0; j <= (WIDTH-names[i].size())/2; j++){
-						output += " ";
-					}
-				}
-				else{
-					for(int j = 0; j < (WIDTH-names[i].size())/2; j++){
-						output += " ";
-					}
-				}
-
-			}
-		}
-		output += "|\n";
-		for(int i = 0; i <= names.size(); i++){
-			for(int j = 0; j <= WIDTH; j++){
-				output+="-";
-			}
-		}
-		output += "\n";
-		//Table values
-		for(int k = 0; k < times.size(); k++){
-			output += "|";
-			for(int i = 0; i <= names.size(); i++){
-				if(i == names.size()){
-					for(int j = 0; j < WIDTH-std::to_string(times[k]).size(); j++){
-						output += " ";
-					}
-					output += std::to_string(times[k]);
-				}
-			
-				else{
-					for(int j = 0; j < WIDTH; j++){
-						output += " ";
-					}
-					output += "|";
-				}
-			}
-			output += "|\n";
-
-		}
-
-
-
-
-		std::cout << output;
-
-
+	int width() const{
+		return WIDTH;
 	}
+
+	friend std::ostream& operator<< (std::ostream &out, const Results &r);
 	
 private:
-	std::vector<double> times;
-	std::vector<std::string> names;
-	int WIDTH = 30;
+	std::vector<double>           _times;
+	std::vector<std::string>      _names;
+	int                           WIDTH = 30;
 
 
 };
+std::ostream& operator<< (std::ostream &out, const Results &r){
+
+		std::stringstream ss;
+		//Table header
+		for(int i = 0; i <= r.names().size(); i++){
+				ss.width(r.width() + 1);
+				ss.fill('-');
+				ss << "-";
+		}
+		ss << "\n";
+		for(int i = 0; i <= r.names().size(); i++){
+			if(i == r.names().size()){
+				std::string time = "time";
+				ss << "|";
+				for(int j = 0; j < (r.width()-time.size())/2; j++){
+					ss << " ";
+				}
+				ss << "time";
+				for(int j = 0; j < (r.width()-time.size())/2; j++){
+					ss << " ";
+				}
+			}
+			else{
+				ss << "|";
+				for(int j = 0; j < (r.width()-r.names()[i].size())/2; j++){
+					ss << " ";
+				}
+
+				ss << r.names()[i];
+				if(r.names()[i].size() % 2 == 1){
+					for(int j = 0; j <= (r.width()-r.names()[i].size())/2; j++){
+						ss << " ";
+					}
+				}
+				else{
+					for(int j = 0; j < (r.width()-r.names()[i].size())/2; j++){
+						ss << " ";
+					}
+				}
+
+			}
+		}
+		ss << "|\n";
+		for(int i = 0; i <= r.names().size(); i++){
+			ss.width(r.width() + 1);
+			ss.fill('-');
+			ss << "-";
+			ss.fill(' ');
+		}
+		ss << "\n";
+		//Table values
+		for(int k = 0; k < r.get_times().size(); k++){
+			ss << "|";
+			for(int i = 0; i <= r.names().size(); i++){
+				if(i == r.names().size()){
+					ss.width(r.width());
+					ss << r.get_times()[k];
+				}
+			
+				else{
+					for(int j = 0; j < r.width(); j++){
+						ss << " ";
+					}
+					ss << "|";
+				}
+			}
+			ss << "|\n";
+
+		}
+
+
+
+
+		out << ss.str();
+		return out;
+
+
+	}
 
