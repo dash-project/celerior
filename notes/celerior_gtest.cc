@@ -43,29 +43,26 @@ TEST(FixtureVariableDouble,StepTimesRange){
 	FixtureVariable<double> fv5 = FixtureVariable<double>("DoubleTest");
 	fv5.step(times<double>(2.0)).range(1.0,32.0);
 	std::vector<double> testVec5 = {1.0,2.0,4.0,8.0,16.0,32.0};
-
 	EXPECT_EQ(testVec5,fv5.values());
 
 }
 
 TEST(FixtureBase, Constructors) {
-
-    
-
-
+	FixtureBase fb;
+	fb.add_variable<int>("units").range(1,4).step(1);
+	fb.add_variable<double>("size").range(1000.0,16000.0).step(times<double>(2));
+	FixtureVariable<int> units = FixtureVariable<int>("units").range(1,4).step(1);
+	std::vector<int> testVec = units.values();
+	std::vector<int> baseVec = fb.variables().front() -> values();
+	EXPECT_EQ(testVec,baseVec);
 }
 
 
 int main (int argc, char* argv[]){
 	testing::InitGoogleTest(&argc, argv);
 
-  Result r;
 
   //  http://www.cplusplus.com/reference/sstream/stringstream/
-  std::cout << "int value: "   << 123 << '\n'
-            << "float value: " << std::fixed << std::setprecision(4) << 1.23
-            << r
-            << std::endl;
 
 	return RUN_ALL_TESTS();
 }

@@ -19,9 +19,15 @@ private:
 	VarType         _times;
 
 };
-
+class FixtureVariableBase{
+public:
+	virtual std::string name() const = 0;
+	virtual ~FixtureVariableBase() {
+	}
+		
+};
 template <class VarType>
-class FixtureVariable{
+class FixtureVariable : public FixtureVariableBase {
 	typedef FixtureVariable<VarType> self_t;
 public:
 	FixtureVariable(const std::string & var_name)
@@ -92,11 +98,6 @@ public:
 	std::string name() const {
 		return _name;
 	}
-	void temp(){
-		int cap = _values.capacity();
-		std::cout << "\n" << cap << "\n";
-	}
-
 private:
 	std::string          _name;
 	int                  _steptf;
@@ -108,31 +109,33 @@ private:
 	VarType              _stepsize;
 	VarType              _times;
 };
-template<class VarType>
 class FixtureBase
 {
 public:
 
 	// Map<Dimensions,Values>
-	std::vector<FixtureVariable<VarType>> variables() const
+	std::vector<FixtureVariableBase *> variables() const
 	{
 		return _variables;
 	}
 
-	FixtureVariable<VarType> & add_variable(const std::string & var_name) {
+	template<class VarType>
+	FixtureVariable<VarType> add_variable(const std::string & var_name) {
 		FixtureVariable<VarType> _fix = FixtureVariable<VarType>(var_name);
-		_variables.push_back(_fix);
-		return _variables.back();
+		FixtureVariable<VarType> * varp = &_fix;
+		_variables.push_back(varp);
+		return _fix;
 	}
-
-	FixtureVariable<VarType> & set_units() {
-		add_variable("units");
-		return _variables.back();
+	template<class VarType>
+	FixtureVariable<VarType> set_units() {
+		FixtureVariable<VarType> units = add_variable<VarType>("units");
+		return units;
 	}
-
-	FixtureVariable<VarType> & set_size() {
-		add_variable("size");
-		return _variables.back();
+	
+	template<class VarType>
+	FixtureVariable<VarType>  set_size() {
+		FixtureVariable<VarType> size = add_variable<VarType>("size");
+		return size;
 	}
 
 	//Setup the FixtureVariables here
@@ -161,16 +164,16 @@ public:
 	}
 
 	//Array with sizes of the vectors in the FixtureVariables
-	void vecSizes() {
+/*	void vecSizes() {
 		int vecSize;
 		for(auto iter = _variables.begin(); iter != _variables.end(); ++iter) {
 			vecSize = iter -> values().size();
 			_vecSizes.push_back(vecSize);
 		}
-	}
+	}*/
 
 	//Number of samples
-	void numSamples() {
+/*	void numSamples() {
 		int samples = 1;
 		int size;
 		for(auto iter = _variables.begin(); iter != _variables.end(); ++iter){
@@ -179,9 +182,9 @@ public:
 		}
 
 		_samples = samples;
-	}
+	}*/
 
-	//Map with values for a specific run(count) of the benchmark
+/*	//Map with values for a specific run(count) of the benchmark
 	std::map<std::string,int> benchVariables(int count){
 		std::map<std::string,int> _benchVariables;
 		std::string name;
@@ -209,7 +212,7 @@ public:
 		}
 
 		return _benchVariables;
-	}
+	}*/
 
 	int get_numVar() const {
 		return _numVar;
@@ -225,7 +228,7 @@ public:
 
 
 private:
-	std::vector<FixtureVariable<VarType>>                 _variables;
+	std::vector<FixtureVariableBase *>                    _variables;
 	int                                                   _numVar;
 	int                                                   _samples;
 	std::vector<int>                                      _vecSizes;
