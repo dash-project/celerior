@@ -21,10 +21,9 @@ private:
 };
 class FixtureVariableBase{
 public:
-	virtual std::string name() const = 0;
+	FixtureVariableBase(){}
 	virtual ~FixtureVariableBase() {
 	}
-		
 };
 template <class VarType>
 class FixtureVariable : public FixtureVariableBase {
@@ -91,7 +90,7 @@ public:
 
 	}
 
-	std::vector<VarType> values() const {
+	std::vector<VarType> values() const{
 		return _values;
 	}
 
@@ -225,6 +224,8 @@ public:
 	std::vector<int> get_vecSizes() const {
 		return _vecSizes;
 	}
+
+	virtual void UserBenchmark(){}
 
 
 private:
