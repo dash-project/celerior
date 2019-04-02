@@ -1,5 +1,4 @@
 #include "Results.h"
-#include <chrono>
 
 typedef std::chrono::high_resolution_clock Clock;
 class Celerior
@@ -13,11 +12,29 @@ public:
 	}
 
 	void run(FixtureBase * fix){
-		auto t1 = Clock::now();
-		fix -> UserBenchmark();
-		auto t2 = Clock::now();
-		auto time = std::chrono::duration_cast<std::chrono::microseconds>(t2-t1).count();
-		std::cout << time << " microseconds\n";
+		std::map<std::string,int> benchVariables;
+		std::vector<int> values;
+		fix -> setupFixture();
+		fix -> numSamples();
+		fix -> numVar();
+		fix -> vecSizes();
+		fix -> varNamesFill();
+		Results r = Results(fix -> varNames());
+		int samples = fix -> samples();
+		for(int k = 0; k < samples; k++){
+			benchVariables = fix -> benchVariables(k);
+			for(auto iter = benchVariables.begin(); iter != benchVariables.end(); ++iter){
+				values.push_back(iter -> second);	
+			}
+			auto t1 = Clock::now();
+			fix -> UserBenchmark(benchVariables);
+			auto t2 = Clock::now();
+			auto time = std::chrono::duration_cast<std::chrono::microseconds>(t2-t1);
+			r.add_time(values,time);
+//			std::cout << time << " microseconds\n";
+			values.clear();
+		}
+		std::cout << r;
 
 	}
 		
