@@ -4,30 +4,17 @@
 	void setupFixture(){
 		add_variable("units").range(0,5).step(1);
 		set_size().range({10,20,30,40});
+		add_variable("other").range(1,16).step(times(2));
+	}
+	CONTAINER(test_vector,std::vector<int>);
+	PRE_SAMPLE{
+		test_vector.push_back(variables["size"]);
 	}
 	};
 BENCHMARK(Test,MyFixture) {
-	std::cout << variables["size"] << " ";
-	for(int i = 0; i <= variables["units"]; i++){
-		std::cout << "test ";
-	}	
-	std::cout << "\n";
+	std::cout << test_vector.size() << " ";
 }
 int main(){
-	/*MyFixture fix;
-	results_test();
-	for(auto & iter : range){
-		std::cout << iter << " ";
-	}
-	for(auto & iter : range2){
-		std::cout << iter << " ";
-	}
-	for(auto & iter : liste){
-		std::cout << iter << " ";
-	}
-	for(auto & iter : _variableNames){
-		std::cout << iter << " ";
-	}*/
 	Celerior c;
 	UserBenchmark_Test test;
 	c.run(&test);

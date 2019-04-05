@@ -38,6 +38,7 @@ std::ostream& operator<< (std::ostream &out, const Results &r){
 		std::map<std::vector<int>, std::chrono::microseconds> map;
 		std::vector<int> vector;
 		//Table header
+		ss << "\n";
 		for(int i = 0; i <= r.names().size(); i++){
 				ss.width(r.width() + 1);
 				ss.fill('-');

@@ -14,18 +14,24 @@ public:
 	void run(FixtureBase * fix){
 		std::map<std::string,int> benchVariables;
 		std::vector<int> values;
+		std::vector<std::string> names;
 		fix -> setupFixture();
 		fix -> numSamples();
 		fix -> numVar();
 		fix -> vecSizes();
 		fix -> varNamesFill();
-		Results r = Results(fix -> varNames());
+		benchVariables = fix -> benchVariables(0);
+		for(auto iter = benchVariables.begin();iter != benchVariables.end(); ++iter){
+			names.push_back(iter -> first);
+		}
+		Results r = Results(names);
 		int samples = fix -> samples();
 		for(int k = 0; k < samples; k++){
 			benchVariables = fix -> benchVariables(k);
 			for(auto iter = benchVariables.begin(); iter != benchVariables.end(); ++iter){
 				values.push_back(iter -> second);	
 			}
+			fix -> preSample(benchVariables);
 			auto t1 = Clock::now();
 			fix -> UserBenchmark(benchVariables);
 			auto t2 = Clock::now();

@@ -131,19 +131,19 @@ public:
 	}
 
 	//Executed before every sample
-	virtual void preSample(const std::map<std::string,int> & m) {
+	virtual void preSample(std::map<std::string,int> m) {
 	}
 
 	//Executed before every iteration
-	virtual void preIteration(const std::map<std::string,int> & m){
+	virtual void preIteration(std::map<std::string,int> m){
 	}
 
 	//Executed after every iteration
-	virtual void postIteration(const std::map<std::string,int> & m){
+	virtual void postIteration(std::map<std::string,int> m){
 	}
 
 	//Executed after every sample
-	virtual void postSample(const std::map<std::string,int> & m){
+	virtual void postSample(std::map<std::string,int> m){
 	}
 
 
