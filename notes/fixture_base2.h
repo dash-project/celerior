@@ -3,6 +3,7 @@
 #include <vector>
 #include <map>
 #include <iterator>
+#include <chrono>
 
 class times {
 public:
@@ -179,6 +180,20 @@ public:
 		}
 	}
 
+	virtual void setIterations(){
+	}
+
+	std::chrono::microseconds minDuration (std::vector<std::chrono::microseconds> times){
+		std::chrono::microseconds time = std::chrono::microseconds::max();
+		for(auto iter = times.begin(); iter != times.end(); ++iter){
+			if(*iter < time){
+				time = *iter;
+			}
+		}
+		return time;
+
+	}
+
 	//Map with values for a specific run(count) of the benchmark
 	std::map<std::string,int> benchVariables(int count){
 		std::map<std::string,int> _benchVariables;
@@ -209,6 +224,10 @@ public:
 		return _benchVariables;
 	}
 
+	int iterations() const {
+		return _iterations;
+	}
+
 	int numVar() const {
 		return _numVar;
 	}
@@ -228,7 +247,9 @@ public:
 
 	virtual void UserBenchmark(std::map<std::string,int> variables){}
 
+
 protected:
+	int                                                   _iterations;
 	std::vector<FixtureVariable>                          _variables;
 	int                                                   _numVar;
 	int                                                   _samples;

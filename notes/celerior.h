@@ -15,30 +15,39 @@ public:
 		std::map<std::string,int> benchVariables;
 		std::vector<int> values;
 		std::vector<std::string> names;
+		std::vector<std::chrono::microseconds> times;
 		fix -> setupFixture();
 		fix -> numSamples();
 		fix -> numVar();
 		fix -> vecSizes();
 		fix -> varNamesFill();
-		benchVariables = fix -> benchVariables(0);
-		for(auto iter = benchVariables.begin();iter != benchVariables.end(); ++iter){
-			names.push_back(iter -> first);
-		}
-		Results r = Results(names);
-		int samples = fix -> samples();
-		for(int k = 0; k < samples; k++){
-			benchVariables = fix -> benchVariables(k);
-			for(auto iter = benchVariables.begin(); iter != benchVariables.end(); ++iter){
-				values.push_back(iter -> second);	
+		fix -> setIterations();
+		int iterations = fix -> iterations();
+			benchVariables = fix -> benchVariables(0);
+			for(auto iter = benchVariables.begin();iter != benchVariables.end(); ++iter){
+				names.push_back(iter -> first);
 			}
-			fix -> preSample(benchVariables);
-			auto t1 = Clock::now();
-			fix -> UserBenchmark(benchVariables);
-			auto t2 = Clock::now();
-			auto time = std::chrono::duration_cast<std::chrono::microseconds>(t2-t1);
-			r.add_time(values,time);
-//			std::cout << time << " microseconds\n";
-			values.clear();
+			Results r = Results(names);
+			int samples = fix -> samples();
+			for(int k = 0; k < samples; k++){
+				benchVariables = fix -> benchVariables(k);
+				for(auto iter = benchVariables.begin(); iter != benchVariables.end(); ++iter){
+					values.push_back(iter -> second);	
+				}
+				fix -> preSample(benchVariables);
+				for(int j = 0; j < iterations; j++){
+					fix -> preIteration(benchVariables);
+					auto t1 = Clock::now();
+					fix -> UserBenchmark(benchVariables);
+					auto t2 = Clock::now();
+					auto time = std::chrono::duration_cast<std::chrono::microseconds>(t2-t1);
+					times.push_back(time);
+					fix -> postIteration(benchVariables);
+				}
+				r.add_time(values, fix -> minDuration(times));
+				values.clear();
+			times.clear();
+			fix -> postSample(benchVariables);
 		}
 		std::cout << r;
 
